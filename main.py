@@ -11,6 +11,9 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],          
+    allow_headers=["*"],   
 )
 
 products = [
@@ -22,3 +25,32 @@ products = [
 @app.get("/products")
 def read_root():
     return products   
+
+
+@app.get("/products/{id}")
+def read_product(id: int):
+    for product in products:
+        if product.id == id:
+            return product
+    return {"error": "Product not found"}
+
+@app.post("/products")
+def create_product(product: Product):
+    products.append(product)
+    return product
+
+@app.put("/products/{id}")
+def update_product(id: int, product: Product):
+    for index, p in enumerate(products):
+        if p.id == id:
+            products[index] = product
+            return product
+    return {"error": "Product not found"}
+
+@app.delete("/products/{id}")
+def delete_product(id: int):
+    for index, p in enumerate(products):
+        if p.id == id:
+            del products[index]
+            return {"message": "Product deleted successfully"}
+    return {"error": "Product not found"}
